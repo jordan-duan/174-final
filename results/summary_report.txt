@@ -1,0 +1,11 @@
+Boba Shop Operations Analysis Summary
+========================================
+
+Performance Summary:
+--------------------
+BASELINE: 5.66 min avg wait, 6.97 customers/hour
+AUTOMATION: 5.59 min avg wait, 7.81 customers/hour
+STAFFING: 5.40 min avg wait, 7.41 customers/hour
+
+Best Policy: STAFFING
+Improvement: 0.27 minutes (4.7%)
