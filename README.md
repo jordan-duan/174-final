@@ -3,6 +3,7 @@
 **Authors:** Jordan Duan and Valerie He  
 **Course:** INDENG 174 - Professor Zheng  
 **University:** UC Berkeley
+
 **Project folder:** https://drive.google.com/drive/folders/1BxaLf80BN4tZPZe95iASAND5fyajXonG?usp=drive_link 
 
 **Code:** https://github.com/jordan-duan/174-final 
