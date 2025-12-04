@@ -10,6 +10,7 @@ and finding optimal configurations using sliders and real-time updates.
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.widgets import Slider, Button, CheckButtons, RadioButtons
+from matplotlib.animation import FuncAnimation
 import matplotlib.patches as patches
 from typing import Dict, List, Tuple, Any
 import time
@@ -400,7 +401,7 @@ class RealTimeSimulationViewer:
                     pass
         
         # Start animation
-        anim = plt.FuncAnimation(fig, animate, interval=1000, blit=False)
+        anim = FuncAnimation(fig, animate, interval=1000, blit=False)
         
         # Start simulation in background
         self._start_background_simulation(config)
@@ -473,27 +474,33 @@ class RealTimeSimulationViewer:
     def _start_background_simulation(self, config):
         """Start simulation in background thread"""
         def run_simulation():
-            simulator = BobaShopSimulator(config)
             start_time = time.time()
+            update_count = 0
             
             while self.is_running:
+                # Create a new simulator for each update to avoid SimPy environment reuse issues
+                simulator = BobaShopSimulator(config)
                 # Run simulation for a short time
                 results = simulator.run_simulation(simulation_time=5)  # 5 minutes
                 
                 if 'error' not in results:
+                    # Get utilization as proxy for queue activity
+                    utilization = results.get('utilization', {})
+                    
                     # Create data packet
                     data = {
-                        'time': time.time() - start_time,
-                        'cashier_queue': len(simulator.cashier.queue) if hasattr(simulator, 'cashier') else 0,
-                        'barista_queue': len(simulator.barista.queue) if hasattr(simulator, 'barista') else 0,
-                        'sealer_queue': len(simulator.sealer.queue) if hasattr(simulator, 'sealer') else 0,
+                        'time': update_count * 5,  # Use simulation time instead of real time
+                        'cashier_queue': utilization.get('cashier', 0) * 3,  # Scale utilization to approximate queue
+                        'barista_queue': utilization.get('barista', 0) * 3,
+                        'sealer_queue': utilization.get('sealer', 0) * 3,
                         'avg_wait': results.get('avg_wait_time', 0),
                         'throughput': results.get('throughput', 0)
                     }
                     
                     self.simulation_data.put(data)
+                    update_count += 1
                 
-                time.sleep(1)  # Update every second
+                time.sleep(2)  # Update every 2 seconds (simulation takes time)
         
         self.is_running = True
         thread = threading.Thread(target=run_simulation)
