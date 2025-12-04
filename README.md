@@ -4,6 +4,14 @@
 **Course:** INDENG 174 - Professor Zheng  
 **University:** UC Berkeley
 
+**Project folder:** https://drive.google.com/drive/folders/1BxaLf80BN4tZPZe95iASAND5fyajXonG?usp=drive_link 
+
+**Code:** https://github.com/jordan-duan/174-final 
+
+**ReadMe:** https://github.com/jordan-duan/174-final/blob/main/README.md
+
+**Presentation Video:** [add video link here]
+
 ## Overview
 
 This project implements a discrete-event simulation of a boba shop to analyze operational efficiency and identify optimal staffing and automation strategies. We use simulation to model complex, interconnected dynamics that cannot be captured by traditional analytic queueing formulas alone.
@@ -11,7 +19,6 @@ This project implements a discrete-event simulation of a boba shop to analyze op
 ## Why We're Doing This
 
 Boba shops face complex operational challenges: time-varying demand patterns, multi-stage service processes, inventory dependencies, and heterogeneous customer preferences. Traditional queueing models (M/M/s) assume constant arrival rates, exponential service times, and no inventory constraints—assumptions that don't hold in real food-service operations. Discrete-event simulation allows us to model these realistic complexities and evaluate how different policies (staffing, automation) affect performance metrics like wait times, throughput, and utilization.
-
 ## Quick Start
 
 ### Installation
@@ -114,12 +121,10 @@ Based on simulation analysis:
 ```
 Boba-Sim/
 ├── boba_simulator.py          # Main simulation engine (DES, RVG, inventory)
-├── advanced_analysis.py       # Little's Law, M/M/s, statistical validation
-├── comprehensive_demo.py       # Main demo script
+├── comprehensive_demo.py      # Main demo script
 ├── interactive_optimizer.py   # Interactive tools with sliders
 ├── enhanced_visualizations.py # Analysis dashboards
-├── experiment_design.py       # Factorial experiments
-└── results/                  # Output visualizations and reports
+└── results/                   # Output visualizations and reports
 ```
 
 ## Output Files
