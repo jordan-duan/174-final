@@ -8,7 +8,7 @@
 
 **Code:** https://github.com/jordan-duan/174-final 
 
-**ReadMe:**https://github.com/jordan-duan/174-final/blob/main/README.md
+**ReadMe:** https://github.com/jordan-duan/174-final/blob/main/README.md
 
 **Presentation Video:** [add video link here]
 
