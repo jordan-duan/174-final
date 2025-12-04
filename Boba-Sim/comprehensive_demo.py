@@ -3,24 +3,21 @@ Comprehensive Demo Script for Boba Shop Simulator
 Authors: Jordan Duan and Valerie He
 INDENG 174 - Professor Zheng
 
-This script demonstrates all the advanced features including interactive tools,
-enhanced visualizations, and real-time simulation capabilities.
+This script demonstrates all the advanced features including interactive tools
+and enhanced visualizations.
 """
 
 import os
-import time
 import numpy as np
 from boba_simulator import (
-    BobaShopSimulator, 
     create_baseline_config, 
     create_automation_config, 
     create_staffing_config,
     run_monte_carlo_simulation,
-    analyze_results,
-    create_visualizations
+    analyze_results
 )
 from enhanced_visualizations import EnhancedVisualizer
-from interactive_optimizer import InteractiveOptimizer, RealTimeSimulationViewer, create_parameter_sensitivity_analyzer
+from interactive_optimizer import InteractiveOptimizer, create_parameter_sensitivity_analyzer
 
 def run_comprehensive_analysis():
     """Run comprehensive analysis with all visualizations"""
@@ -122,18 +119,6 @@ def run_interactive_demo():
     # Create sensitivity analysis
     create_parameter_sensitivity_analyzer()
 
-def run_real_time_demo():
-    """Run real-time simulation demo"""
-    print("\n6. Real-Time Simulation Viewer")
-    print("-" * 40)
-    print("   Launching real-time simulation dashboard...")
-    print("   Watch the system performance in real-time!")
-    
-    # Create real-time viewer
-    config = create_baseline_config()
-    viewer = RealTimeSimulationViewer()
-    viewer.create_live_dashboard(config)
-
 def create_summary_report(results_dict):
     """Create a summary report of all findings"""
     print("\n7. Summary Report")
@@ -227,8 +212,7 @@ def main():
         print("=" * 60)
         print("The following interactive tools are now available:")
         print("1. Interactive Parameter Explorer - Adjust parameters with sliders")
-        print("2. Real-Time Simulation Viewer - Watch live simulation")
-        print("3. Parameter Sensitivity Analysis - See how parameters affect performance")
+        print("2. Parameter Sensitivity Analysis - See how parameters affect performance")
         
         response = input("\nWould you like to run the interactive demos? (y/n): ").lower().strip()
         
@@ -237,11 +221,6 @@ def main():
             
             # Run interactive demos
             run_interactive_demo()
-            
-            # Ask about real-time demo
-            real_time_response = input("\nWould you like to see the real-time simulation? (y/n): ").lower().strip()
-            if real_time_response in ['y', 'yes']:
-                run_real_time_demo()
         
         print("\n" + "=" * 60)
         print("✅ COMPREHENSIVE DEMO COMPLETED!")

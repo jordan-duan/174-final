@@ -4,7 +4,7 @@ Authors: Jordan Duan and Valerie He
 INDENG 174 - Professor Zheng
 
 This module provides interactive tools for exploring parameter space
-and finding optimal configurations using sliders and real-time updates.
+and finding optimal configurations using sliders.
 """
 
 import numpy as np
@@ -15,8 +15,6 @@ import matplotlib.patches as patches
 from typing import Dict, List, Tuple, Any
 import time
 from boba_simulator import BobaShopSimulator, create_baseline_config, run_monte_carlo_simulation
-import threading
-import queue
 
 class InteractiveOptimizer:
     """Interactive parameter optimization tool"""
@@ -347,165 +345,6 @@ class InteractiveOptimizer:
             targets.append('Cost')
         
         print(f"Optimization targets: {', '.join(targets) if targets else 'None selected'}")
-
-class RealTimeSimulationViewer:
-    """Real-time simulation viewer with live updates"""
-    
-    def __init__(self):
-        """Initialize the real-time viewer"""
-        self.is_running = False
-        self.simulation_data = queue.Queue()
-        
-    def create_live_dashboard(self, config):
-        """Create live simulation dashboard"""
-        fig, axes = plt.subplots(2, 2, figsize=(15, 10))
-        
-        # Initialize plots
-        ax_queue = axes[0, 0]
-        ax_metrics = axes[0, 1]
-        ax_customers = axes[1, 0]
-        ax_system = axes[1, 1]
-        
-        # Data storage
-        self.time_data = []
-        self.queue_data = {'cashier': [], 'barista': [], 'sealer': []}
-        self.metric_data = {'wait_time': [], 'throughput': []}
-        self.customer_data = []
-        
-        def animate(frame):
-            if not self.simulation_data.empty():
-                try:
-                    # Get latest data
-                    data = self.simulation_data.get_nowait()
-                    
-                    # Update data
-                    self.time_data.append(data['time'])
-                    self.queue_data['cashier'].append(data['cashier_queue'])
-                    self.queue_data['barista'].append(data['barista_queue'])
-                    self.queue_data['sealer'].append(data['sealer_queue'])
-                    self.metric_data['wait_time'].append(data['avg_wait'])
-                    self.metric_data['throughput'].append(data['throughput'])
-                    
-                    # Keep only last 100 points
-                    if len(self.time_data) > 100:
-                        self.time_data = self.time_data[-100:]
-                        for key in self.queue_data:
-                            self.queue_data[key] = self.queue_data[key][-100:]
-                        for key in self.metric_data:
-                            self.metric_data[key] = self.metric_data[key][-100:]
-                    
-                    # Update plots
-                    self._update_plots(ax_queue, ax_metrics, ax_customers, ax_system)
-                    
-                except queue.Empty:
-                    pass
-        
-        # Start animation
-        anim = FuncAnimation(fig, animate, interval=1000, blit=False)
-        
-        # Start simulation in background
-        self._start_background_simulation(config)
-        
-        plt.suptitle('Real-Time Boba Shop Simulation', fontsize=16, fontweight='bold')
-        plt.tight_layout()
-        plt.show()
-        
-        return anim
-    
-    def _update_plots(self, ax_queue, ax_metrics, ax_customers, ax_system):
-        """Update all plots with latest data"""
-        # Clear axes
-        ax_queue.clear()
-        ax_metrics.clear()
-        ax_customers.clear()
-        ax_system.clear()
-        
-        if not self.time_data:
-            return
-        
-        # Plot 1: Queue lengths over time
-        ax_queue.plot(self.time_data, self.queue_data['cashier'], label='Cashier', linewidth=2)
-        ax_queue.plot(self.time_data, self.queue_data['barista'], label='Barista', linewidth=2)
-        ax_queue.plot(self.time_data, self.queue_data['sealer'], label='Sealer', linewidth=2)
-        ax_queue.set_title('Queue Lengths Over Time')
-        ax_queue.set_xlabel('Time (minutes)')
-        ax_queue.set_ylabel('Queue Length')
-        ax_queue.legend()
-        ax_queue.grid(True, alpha=0.3)
-        
-        # Plot 2: Performance metrics
-        ax_metrics.plot(self.time_data, self.metric_data['wait_time'], label='Avg Wait Time', linewidth=2, color='red')
-        ax_metrics2 = ax_metrics.twinx()
-        ax_metrics2.plot(self.time_data, self.metric_data['throughput'], label='Throughput', linewidth=2, color='blue')
-        ax_metrics.set_title('Performance Metrics')
-        ax_metrics.set_xlabel('Time (minutes)')
-        ax_metrics.set_ylabel('Wait Time (min)', color='red')
-        ax_metrics2.set_ylabel('Throughput (cust/hr)', color='blue')
-        ax_metrics.grid(True, alpha=0.3)
-        
-        # Plot 3: Customer flow
-        if self.customer_data:
-            customer_times = [c['arrival_time'] for c in self.customer_data]
-            customer_wait = [c['wait_time'] for c in self.customer_data]
-            ax_customers.scatter(customer_times, customer_wait, alpha=0.6, s=20)
-            ax_customers.set_title('Customer Wait Times')
-            ax_customers.set_xlabel('Arrival Time (minutes)')
-            ax_customers.set_ylabel('Wait Time (minutes)')
-            ax_customers.grid(True, alpha=0.3)
-        
-        # Plot 4: System status
-        stations = ['Cashier', 'Barista', 'Sealer']
-        current_queues = [self.queue_data['cashier'][-1] if self.queue_data['cashier'] else 0,
-                         self.queue_data['barista'][-1] if self.queue_data['barista'] else 0,
-                         self.queue_data['sealer'][-1] if self.queue_data['sealer'] else 0]
-        
-        colors = ['red' if q > 3 else 'orange' if q > 1 else 'green' for q in current_queues]
-        bars = ax_system.bar(stations, current_queues, color=colors, alpha=0.7)
-        ax_system.set_title('Current System Status')
-        ax_system.set_ylabel('Queue Length')
-        ax_system.set_ylim(0, 10)
-        
-        # Add value labels
-        for bar, value in zip(bars, current_queues):
-            height = bar.get_height()
-            ax_system.text(bar.get_x() + bar.get_width()/2., height + 0.1,
-                          f'{value}', ha='center', va='bottom', fontweight='bold')
-    
-    def _start_background_simulation(self, config):
-        """Start simulation in background thread"""
-        def run_simulation():
-            start_time = time.time()
-            update_count = 0
-            
-            while self.is_running:
-                # Create a new simulator for each update to avoid SimPy environment reuse issues
-                simulator = BobaShopSimulator(config)
-                # Run simulation for a short time
-                results = simulator.run_simulation(simulation_time=5)  # 5 minutes
-                
-                if 'error' not in results:
-                    # Get utilization as proxy for queue activity
-                    utilization = results.get('utilization', {})
-                    
-                    # Create data packet
-                    data = {
-                        'time': update_count * 5,  # Use simulation time instead of real time
-                        'cashier_queue': utilization.get('cashier', 0) * 3,  # Scale utilization to approximate queue
-                        'barista_queue': utilization.get('barista', 0) * 3,
-                        'sealer_queue': utilization.get('sealer', 0) * 3,
-                        'avg_wait': results.get('avg_wait_time', 0),
-                        'throughput': results.get('throughput', 0)
-                    }
-                    
-                    self.simulation_data.put(data)
-                    update_count += 1
-                
-                time.sleep(2)  # Update every 2 seconds (simulation takes time)
-        
-        self.is_running = True
-        thread = threading.Thread(target=run_simulation)
-        thread.daemon = True
-        thread.start()
 
 def create_parameter_sensitivity_analyzer():
     """Create parameter sensitivity analysis tool"""
