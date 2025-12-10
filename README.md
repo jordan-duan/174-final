@@ -10,7 +10,7 @@
 
 **ReadMe:** https://github.com/jordan-duan/174-final/blob/main/README.md
 
-**Presentation Video:** [add video link here]
+**Presentation Video:** https://youtu.be/1cV54L6P9w8
 
 ## Overview
 
